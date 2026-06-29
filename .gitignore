@@ -1,0 +1,28 @@
+# --- generated data & artifacts (Section 8: gitignore data, track reports) ---
+results/*
+!results/.gitkeep
+!results/*.md          # tracked reports/writeups live in results/ too
+datasets/
+*.parquet
+*.csv
+*.npz
+*.ckpt
+*.pt
+*.joblib
+*.pkl
+
+# --- python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+
+# --- editors / os ---
+.idea/                 # PyCharm — kept out of history deliberately
+.vscode/
+.DS_Store
+.ipynb_checkpoints/

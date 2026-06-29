@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "threebody-ml"
+version = "0.0.1"
+description = "Classical-ML stability surrogate + active-learning loop on top of the three-body orbit hunter (threebody-physics)."
+requires-python = ">=3.10"
+dependencies = [
+    # The physics engine. Install editable from the sibling repo:
+    #   pip install -e ../PythonProject1
+    # (declared here for documentation; pip won't resolve a local path
+    #  automatically, so install it explicitly — see README.)
+    "threebody-physics",
+    "numpy>=1.20",
+    "scipy>=1.7",            # qmc.Sobol for candidate pools, stats
+    "pandas>=1.3",           # labelled tables
+    "scikit-learn>=1.1",     # GaussianProcessRegressor (the load-bearing model)
+    "matplotlib>=3.4",       # experiment plots
+]
+
+[project.optional-dependencies]
+# Gradient-boosted comparators (Section 5). Either or both.
+trees = ["xgboost>=1.6", "lightgbm>=3.3"]
+# Parquet output for label tables (otherwise CSV).
+parquet = ["pyarrow>=10"]
+# Sparse/inducing-point GP for Track B at scan scale (Section 6). Deferred.
+bigp = ["gpytorch>=1.9", "torch>=2.0"]
+
+[tool.setuptools]
+# Flat-layout packages mirroring the Section 8 directory plan. Run scripts with
+# the module form from the repo root, e.g. `python -m surrogate.active_loop`.
+packages = ["data", "surrogate", "baselines", "experiments"]
