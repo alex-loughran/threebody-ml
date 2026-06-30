@@ -43,3 +43,22 @@ STABLE_LAMBDA_MAX = 1.0 + 1e-3
 def ensure_dirs() -> None:
     DATASETS.mkdir(parents=True, exist_ok=True)
     RESULTS.mkdir(parents=True, exist_ok=True)
+
+
+# --- feature engineering (physics-free; shared by labeller and family loader) -
+# Section 5 schema. Kept here so any module can build features without importing
+# the physics engine.
+FEATURE_COLS = ["a", "c", "L", "ac", "L_minus_ac", "sign_c"]
+
+
+def add_features(df):
+    """Add the Section 5 derived features to a DataFrame with a, c, L columns.
+    Cheap, deterministic, no leakage. Returns df unchanged if empty."""
+    import numpy as np
+    if df.empty:
+        return df
+    df = df.copy()
+    df["ac"] = df["a"] * df["c"]
+    df["L_minus_ac"] = df["L"] - df["ac"]
+    df["sign_c"] = np.sign(df["c"])
+    return df

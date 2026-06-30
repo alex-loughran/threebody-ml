@@ -125,18 +125,9 @@ def build_seed_table() -> pd.DataFrame:
     return add_features(df)
 
 
-def add_features(df: pd.DataFrame) -> pd.DataFrame:
-    """Section 5 derived features. Cheap, deterministic, no leakage."""
-    if df.empty:
-        return df
-    df = df.copy()
-    df["ac"] = df["a"] * df["c"]
-    df["L_minus_ac"] = df["L"] - df["ac"]
-    df["sign_c"] = np.sign(df["c"])
-    return df
-
-
-FEATURE_COLS = ["a", "c", "L", "ac", "L_minus_ac", "sign_c"]
+# Feature engineering now lives in ml_config (physics-free, shared with the
+# family loader). Re-exported here so existing imports keep working.
+from ml_config import FEATURE_COLS, add_features  # noqa: E402,F401
 
 
 def save_table(df: pd.DataFrame, stem: str, prefer_parquet: bool = True) -> str:

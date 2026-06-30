@@ -13,7 +13,8 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
 
 
-def build_gp(length_scale=(1.0, 1.0, 1.0), nu: float = 2.5) -> Pipeline:
+def build_gp(length_scale=1.0, nu: float = 2.5,
+             n_restarts: int = 4) -> Pipeline:
     """A scaled-input Matern GP regressor.
 
     - Matern(nu=2.5): twice-differentiable, a sane default for smooth-ish but not
@@ -32,8 +33,8 @@ def build_gp(length_scale=(1.0, 1.0, 1.0), nu: float = 2.5) -> Pipeline:
     )
     gp = GaussianProcessRegressor(
         kernel=kernel,
-        normalize_y=True,          # center/scale the target
-        n_restarts_optimizer=4,    # robuster hyperparameter fit on small data
+        normalize_y=True,              # center/scale the target
+        n_restarts_optimizer=n_restarts,  # robuster fit; lower for inner AL loops
         random_state=0,
     )
     # Scale inputs, then GP. predict(..., return_std=True) flows through.
