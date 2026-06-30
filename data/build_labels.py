@@ -67,16 +67,29 @@ def label_point(a: float, c: float, L: float, T_guess: float,
                 source: str = "active") -> Label | None:
     """Refine (a,c,L) to a true orbit and classify its stability.
 
-    Returns None if Newton refinement fails to converge — a non-orbit point
-    carries no usable stability label. Callers should treat None as "spent one
-    evaluation, got no label" (it still costs budget).
+    Returns None if Newton fails to converge OR the integration blows up — a
+    non-orbit point carries no usable stability label. Callers should treat None
+    as "spent one evaluation, got no label" (it still costs budget).
+
+    Robustness note: off-manifold points can drive the orbit toward a
+    near-collision where the variational integrator's step size underflows and
+    compute_monodromy *raises* (RuntimeError: "Required step size is less than
+    spacing between numbers"), rather than returning a non-converged flag. We
+    catch that here so a random candidate pool degrades a budget unit instead of
+    crashing the whole active loop.
     """
-    a_r, c_r, T_r, ok, _info = newton_refine_bhh(a, c, L, T_guess)
+    try:
+        a_r, c_r, T_r, ok, _info = newton_refine_bhh(a, c, L, T_guess)
+    except Exception:
+        return None
     if not ok:
         return None
 
-    state0 = initial_conditions_from_params(a_r, c_r, L)
-    res = analyse_orbit(state0, T_r, verbose=False)
+    try:
+        state0 = initial_conditions_from_params(a_r, c_r, L)
+        res = analyse_orbit(state0, T_r, verbose=False)
+    except Exception:
+        return None
     if not res.get("valid", True):
         return None
 

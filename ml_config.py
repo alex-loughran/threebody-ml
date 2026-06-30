@@ -27,10 +27,13 @@ RESULTS = REPO_ROOT / "results"     # gitignored data + tracked reports
 # pragmatic envelope around the seed catalogue. Tighten them against the real
 # Jankovic/BHH ranges (build_labels can print the seed extent) before trusting a
 # discovery run. See decision log, Section 11.
+# Measured from the 75 Jankovic seeds (build_labels --seeds, 2026-06-29),
+# padded slightly. NOTE: c is roughly symmetric (seeds span -3.2..+3.9), not
+# negative-only as first guessed; L is a narrow band, not (0,1).
 BOUNDS = {
-    "a": (0.0, 0.5),
-    "c": (-3.0, 0.0),
-    "L": (0.0, 1.0),
+    "a": (0.05, 0.55),
+    "c": (-3.3, 4.0),
+    "L": (0.65, 1.07),
 }
 
 # Stability threshold (Section 3/5): all Floquet multipliers on the unit circle.
