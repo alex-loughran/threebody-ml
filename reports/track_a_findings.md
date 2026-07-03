@@ -98,6 +98,34 @@ at the margin and cannot fix novel-topology extrapolation** — which is the
 evidence that the real lever is a representation learned from the dynamics, not
 more feature engineering.
 
+## Result 5 — dynamics features *do* improve extrapolation (the positive result)
+
+Scalars weren't enough (Result 4), so we extracted **rotation/scale-invariant
+features from each orbit's trajectory** (`data/build_traj_features.py`):
+close-approach severity (`d_min`), extent, size-pulsation (moment-of-inertia
+CV), and shape-sphere path/topology descriptors (equator crossings, path
+spread). These describe the orbit's intrinsic geometry rather than the `(a,c,L)`
+that merely index it.
+
+Leave-one-family-out, RandomForest:
+
+| feature set | interpolation (CV) | extrapolation (mean) | typical novel family* |
+|---|---|---|---|
+| `(a,c,L)` + derived | 0.102 | 0.656 | 0.350 |
+| **+ trajectory features** | **0.065** | **0.523** | **0.195** |
+
+\*mean over the 9 in-distribution families (excludes `jankovic2_b3`).
+
+Per-family the gains are large — seed70 0.57→0.14, seed60 0.26→0.04, seed20
+0.20→0.05; 6 of 10 families now extrapolate below 0.15 RMSE. **Representation, not
+parameters, is what transfers.**
+
+The exception is honest and instructive: `jankovic2_b3` stays broken (~3.5)
+because its `λ_max` reaches 2.7×10⁵ — a *target* range 100× beyond any other
+family. That is out-of-distribution in the label, a data-coverage limit no
+feature representation can fix. It motivates the deep-learning thread (learned
+embeddings of the dynamics) *and* bounds what any surrogate can promise.
+
 ## Honest conclusion
 
 A cheap classical surrogate predicts three-body orbital stability to R²≈0.996
