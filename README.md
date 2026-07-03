@@ -56,24 +56,50 @@ threebody-ml/
 
 ## Quickstart
 
-```bash
-# Label the 75 Jankovic catalogue seeds (one variational integration each):
-python -m data.build_labels --seeds
-
-# Sanity-check on-disk scan maps:
-python -m data.load_scans
-
-# Run the headline comparison (writes results/exp01_*.json + .png):
-python -m experiments.exp01_surrogate_vs_grid --budget 40 --acq stable_lcb
-```
-
 Always run from the repo root so the flat-layout packages import cleanly.
 
-## Status / open gates
+```bash
+# Rebuild the labelled pool from pre-traced continuation families (no physics):
+python -m data.load_families
 
-Starter scaffold. Before trusting a discovery run, tighten `ml_config.BOUNDS`
-against the real Jankovic/BHH parameter extent (`build_labels --seeds` prints
-the seed extent). Track B (discovery selection function) and the deferred DL
-track are not built yet — see the kickoff doc, Sections 6–7 and the decision log
-(Section 11). Korn / CERN feedback is still pending and may redirect the aim;
-don't over-invest in ML infrastructure before it lands.
+# Active-learning-vs-random benchmark (in-memory, fast):
+python -m experiments.exp02_active_vs_random --budget 160 --repeats 6
+
+# Cross-family extrapolation test:
+python -m experiments.exp03_cross_family
+
+# (Re)generate stability labels for the 75 catalogue seeds (does physics integ.):
+python -m data.build_labels --seeds
+```
+
+## Status — read this first if resuming
+
+**Track A (classical surrogate) is characterised; findings in
+[`reports/track_a_findings.md`](reports/track_a_findings.md).** Headline: a cheap
+surrogate predicts `log10(λ_max)` from `(a,c,L)` at **R²≈0.996 within known
+families**, but two honest negatives bound it — active learning gives **no
+advantage over random** on the diverse 10-family pool (the early single-curve 4×
+was an artifact), and it **does not extrapolate to unseen families** (hand-crafted
+physics features E/T help only ~7%).
+
+**Data engine:** continuation families (`data/load_families.py` reads
+`<physics-repo>/mini_results/continuation_family_*.json` — 10 families, ~2,400
+on-manifold points already traced and on disk). Random `(a,c,L)` sampling was
+abandoned (only ~6% refine to an orbit). `ml_config.BOUNDS` is set to the real
+seed extent.
+
+### Where to pick up
+1. **Representation learning (the real fix for extrapolation).** Learn features
+   from the *dynamics* (trajectory / shape-sphere), not raw `(a,c,L)`. This is the
+   deep-learning / Neural-ODE thread; scalars have been shown insufficient
+   (`reports/track_a_findings.md`, Result 4).
+2. **Physics writeup input:** [`reports/bifurcation_census.md`](reports/bifurcation_census.md)
+   — the stable L≠0 orbit is pinned at `(a,c,L)=(0.2468,-2.0335,0.8305)`; `seed40`
+   is a 20-stability-change bifurcation hotspot.
+
+**Deprecated:** `experiments/exp01_surrogate_vs_grid.py`, `baselines/uniform_grid.py`,
+and the Sobol pool in `surrogate/active_loop.py` assume the abandoned
+random-sampling data engine — kept for history, not the current path.
+
+Superseding context and rationale live in the user's project memory
+(`project_threebody_ml.md`).
