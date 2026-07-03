@@ -79,6 +79,25 @@ genuinely novel topologies. It is triage-grade, not a discovery oracle.
 
 ---
 
+## Result 4 — do transferable physics features help extrapolation? (a little)
+
+Before reaching for deep learning, the cheap thing to try is *hand-crafted*
+transferable features. Adding energy `E` and period `T` (both available per
+point, non-leaky) to the leave-one-family-out test:
+
+| feature set | mean extrapolation RMSE |
+|---|---|
+| `(a,c,L)` + derived | 0.657 |
+| + energy `E` | 0.626 |
+| + energy `E`, period `T` | **0.611** |
+
+A real but marginal ~7 % gain, with solid improvements on *near-distribution*
+families (seed20 0.20→0.06, seed60 0.26→0.08). But the out-of-distribution
+family `jankovic2_b3` stays catastrophic (~3.5). **Hand-engineered scalars help
+at the margin and cannot fix novel-topology extrapolation** — which is the
+evidence that the real lever is a representation learned from the dynamics, not
+more feature engineering.
+
 ## Honest conclusion
 
 A cheap classical surrogate predicts three-body orbital stability to R²≈0.996
