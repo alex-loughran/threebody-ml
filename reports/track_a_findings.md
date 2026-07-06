@@ -126,6 +126,28 @@ family. That is out-of-distribution in the label, a data-coverage limit no
 feature representation can fix. It motivates the deep-learning thread (learned
 embeddings of the dynamics) *and* bounds what any surrogate can promise.
 
+## Result 6 — as a triage tool it is genuinely useful (within the explored region)
+
+RMSE was never the real objective; *ranking* is. Reframed as triage — rank orbits
+by predicted stability so expensive exact (variational-monodromy) analysis is
+spent on the promising (least-unstable) ones:
+
+| features | interpolation Spearman | extrapolation Spearman |
+|---|---|---|
+| `(a,c,L)` | 0.988 | 0.219 |
+| + trajectory | 0.994 | −0.045 |
+
+**Interpolation triage is excellent:** analysing only the **~10 %** of candidates
+the surrogate ranks most promising catches **90 %** of the truly-interesting
+(bottom-decile `λ_max`) orbits — a ~9× saving in expensive analysis (see
+`reports/figures/triage_efficiency.png`).
+
+**Extrapolation triage fails**, and instructively: trajectory features cut the
+error *magnitude* across families (Result 5) but do **not** fix cross-family
+*rank order* (Spearman ≈ 0), and the out-of-distribution `jankovic2_b3` dominates
+the global statistic. So the honest operating envelope is: **triage the rest of a
+region after labelling part of it; do not triage genuinely novel regions.**
+
 ## Honest conclusion
 
 A cheap classical surrogate predicts three-body orbital stability to R²≈0.996
