@@ -5,9 +5,12 @@ periodic three-body orbit — its maximum Floquet multiplier `λ_max` — from i
 low-dimensional parameters `(a, c, L)`, so that expensive variational
 integrations can be avoided or prioritised?
 
-**Short answer.** Yes for *interpolation* (R²≈0.996), with two honest negative
-results that bound how the surrogate can be used. This report is deliberately
-even-handed about what did and did not work.
+**Short answer.** Yes within the explored region (R²≈0.996), and as a *triage*
+tool it saves ~9× the expensive analysis. Two honest negatives bound it — active
+learning gives no advantage over random, and it does not extrapolate to novel
+families — but features learned from the *dynamics* (not the raw parameters)
+recover most of the cross-family gap. This report is deliberately even-handed
+about what did and did not work.
 
 ---
 
@@ -151,13 +154,19 @@ region after labelling part of it; do not triage genuinely novel regions.**
 ## Honest conclusion
 
 A cheap classical surrogate predicts three-body orbital stability to R²≈0.996
-**within known family regions**, and can triage candidates before spending
-expensive integrations. But (a) active learning gives no advantage over random at
-these budgets, and (b) the surrogate does not extrapolate to unseen families.
+**within known family regions**, and as a triage tool catches 90 % of the
+interesting orbits while analysing only ~10 % — a ~9× saving. Two things it does
+*not* do: active learning gives no advantage over random at these budgets (the
+early single-curve 4× was an artifact), and it does not extrapolate to unseen
+families from parameters alone.
 
-The natural way to attack (b) is a **better representation** — features learned
-from the orbit's *dynamics* rather than the raw parameters `(a,c,L)` — which is
-the next thread (see the deep-learning / Neural-ODE track).
+The lever for that last gap is **representation, not parameters**: features
+describing the orbit's *dynamics* (close-approach, size-pulsation, shape-sphere
+path/topology) cut mean cross-family error from 0.66 → 0.52 (0.35 → 0.20 off the
+one out-of-distribution family) — validating that learned embeddings of the
+dynamics are the right next thread (the deep-learning / Neural-ODE track). The
+residual failure is a *data-coverage* limit (one family's `λ_max` is 100× beyond
+the rest), which no representation can fix — only more data can.
 
 *Reproduce:* `python -m experiments.exp02_active_vs_random` (AL benchmark),
 `python -m experiments.exp03_cross_family` (extrapolation). Data engine:
